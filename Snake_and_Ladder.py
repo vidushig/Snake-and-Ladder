@@ -1,12 +1,6 @@
 import sys, random
 import pandas as pd
-
-              
-                           
-                          
-
 import csv
-           
 
 DICE_FACE = 6
 SLEEP_TIME = 1
@@ -64,8 +58,6 @@ def welcome():
 #Get no of player
 def get_player_count():
     
-                
-    
     no_of_players = int(input("Enter the number of players: "))
     
     while (no_of_players < 2) or (no_of_players > 6):
@@ -102,17 +94,12 @@ def ladder_value(player, old_value, current_value):
     print("\nYayy. " + player + " has landed on a square with a ladder.")
     print(player + " will climb up the ladder from '" + str(old_value) + "' to '" + str(current_value) + "'")
 
-                                    
 def snake_ladder(player, current_value, old_value, dice_value):
-    
-                             
-                                              
     
     #Check if value is within MAX_VALUE
     #print(player, current_value, old_value)
     
     if current_value > MAX_VALUE:
-                                 
         print("\nOops! " + player + " will remain at the same position '" + str(old_value) + "' till " + player + " gets '" + str(MAX_VALUE - old_value) + "'")
         current_value = old_value
         #print("current value is: ", current_value)
@@ -140,24 +127,14 @@ def check_win(player, position):
         return False
     return True
 
-     
 def start():
     
     welcome()
-    
     player_data = get_player_count()
 
-                                                                         
-                       
     GAME_STARTED  = True
     
     while(GAME_STARTED):
-
-                                                         
-        
-                                                                                              
-                                                            
-                                         
         for i in range(len(player_data)):
             
             if player_data.iloc[i,1] == 0:
@@ -194,16 +171,6 @@ def start():
 
 #Main function
 if __name__ == "__main__":
-                                                                        
-                                             
-                                               
-                                                    
-                                                                          
-                                                                      
-                                                                     
-                                                            
-                                                                         
-                              
     
     player_data = start()
     
