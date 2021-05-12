@@ -1,11 +1,11 @@
-### Snake and Ladder Game
-### Multiple player game
+import sys, random
+import pandas as pd
 
               
                            
                           
 
-import random, time, sys
+import csv
            
 
 DICE_FACE = 6
@@ -39,6 +39,9 @@ ladder = {
 87: 93
 }
 
+column_name = ['Player_Name', 'Start', 'Current_Value', 'Old_Value', 'Dice_Value']
+player_data = pd.DataFrame(columns = column_name)
+
 #Rules of the game
 def welcome():
     
@@ -57,51 +60,62 @@ def welcome():
     Enjoy the game !
     """)
 
-#Get player data
-def get_player_names():
+
+#Get no of player
+def get_player_count():
     
-    players = []
+                
     
     no_of_players = int(input("Enter the number of players: "))
     
-    if (no_of_players < 2) or (no_of_players > 6):
+    while (no_of_players < 2) or (no_of_players > 6):
         print("""\nNOTE: Minimum number of players = 2
         Maximum number of players = 6""")
         no_of_players = int(input("Enter a valid number of players: "))
     
+    player_data = pd.DataFrame(0, index = range(no_of_players), columns = column_name)
+            
     for i in range(0, no_of_players):
-        name = input("Enter the name of player no %d: " %(i+1))
-        players.append(name)
+        name = input("Enter name of player %d: " %(i+1))
+        player_data.iloc[i,0] = name
     
-    return players
+    return player_data
 
 #Roll the dice
 def get_dice_value():
+    
     dice_value = random.randint(1, DICE_FACE)
-    print("\nIt's a '" + str(dice_value) + "'")
+    print("It's a '" + str(dice_value) + "'")
     
     return dice_value
 
+
 #Player hit a snake square
 def snake_value(player, old_value, current_value):
+    
     print("\nOh no! You have reached the sqaure with a snake." )
     print(player + " will move down the snake from '" + str(old_value) + "' to '" + str(current_value) + "'")
 
 #Player hit a ladder square
 def ladder_value(player, old_value, current_value):
+    
     print("\nYayy. " + player + " has landed on a square with a ladder.")
     print(player + " will climb up the ladder from '" + str(old_value) + "' to '" + str(current_value) + "'")
 
-#Final value based on snake / ladder
-def snake_ladder(player, current_value, dice_value):
+                                    
+def snake_ladder(player, current_value, old_value, dice_value):
     
-    old_value = current_value
-    current_value = current_value + dice_value
+                             
+                                              
     
     #Check if value is within MAX_VALUE
+    #print(player, current_value, old_value)
+    
     if current_value > MAX_VALUE:
-        current_value = old_value
+                                 
         print("\nOops! " + player + " will remain at the same position '" + str(old_value) + "' till " + player + " gets '" + str(MAX_VALUE - old_value) + "'")
+        current_value = old_value
+        #print("current value is: ", current_value)
     else:
         print("\n" + player + " will now move from '" + str(old_value) + "' to '" + str(current_value) + "'")
     
@@ -114,6 +128,8 @@ def snake_ladder(player, current_value, dice_value):
     else:
         final_value = current_value
     
+    #print("CV, OV, FV are: ", current_value, old_value, final_value)
+    
     return final_value
 
 #Check the winning condition
@@ -124,30 +140,57 @@ def check_win(player, position):
         return False
     return True
 
-#Game
-def start_the_game():
+     
+def start():
     
     welcome()
     
-    player_list = get_player_names()
-    
-    player_data = {player_list[i]: 0 for i in range(0, len(player_list))}
-    player_position = 0
+    player_data = get_player_count()
+
+                                                                         
+                       
     GAME_STARTED  = True
     
-    while (GAME_STARTED):
+    while(GAME_STARTED):
 
-        for player, player_points in player_data.items():
+                                                         
         
-            value = input("\nIt is " + player + "'s turn next. Hit enter to roll the dice...")
-            print("\n" + player + " is rolling the dice...")
-            dice_value = get_dice_value()
-            player_data[player] = snake_ladder(player, player_data[player], dice_value)
+                                                                                              
+                                                            
+                                         
+        for i in range(len(player_data)):
             
-            if (check_win(player, player_data[player]) == False):
-                GAME_STARTED = False
-                break
-    print("\nHere is the scoreboard: ",player_data)
+            if player_data.iloc[i,1] == 0:
+                value = input(player_data.iloc[i,0] + " will roll the dice to start the game. Hit enter...")
+                dice = random.randint(1, DICE_FACE)
+                print("\nDice value for player '" + player_data.iloc[i,0] + "' is: '" + str(dice), "'")
+            
+                if dice == 6:
+                    print(player_data.iloc[i,0] + " will enter the game now.")
+                    player_data.iloc[i,1] = 1
+                else:
+                    print(player_data.iloc[i,0] + ", your dice value != '6'. Kindly try again on your next turn.\n")
+            
+            if (dice == 6) or (player_data.iloc[i,1] == 1):
+                value = input("\nIt is " + player_data.iloc[i,0] + "'s turn next. Hit enter to roll the dice...")
+                print("\n" + str(player_data.iloc[i,0]) + " is rolling the dice...")
+                player_data.iloc[i,4] = get_dice_value()
+                
+                player_data.iloc[i,3] = player_data.iloc[i,2]
+                player_data.iloc[i,2] = player_data.iloc[i,2] + player_data.iloc[i,4]
+                
+                #print(player_data.iloc[i,0], player_data.iloc[i,2], player_data.iloc[i,3], player_data.iloc[i,4])
+                
+                player_data.iloc[i,2] = snake_ladder(player_data.iloc[i,0], player_data.iloc[i,2], player_data.iloc[i,3], player_data.iloc[i,4])
+                
+                if (check_win(player_data.iloc[i,0], player_data.iloc[i,2]) == False):
+                    GAME_STARTED = False
+                    break
+            print("\nCurrent player status: \n",player_data)        
+    
+    print("\n\nFINAL SCOREBOARD: \n\n",player_data)
+    
+    return player_data
 
 #Main function
 if __name__ == "__main__":
@@ -162,4 +205,6 @@ if __name__ == "__main__":
                                                                          
                               
     
-    start_the_game()
+    player_data = start()
+    
+    player_data.to_csv('Snake_and_Ladder.csv', mode='a')
