@@ -78,7 +78,6 @@ def get_dice_value(player):
     
     position = 0
     dice_value = random.randint(1, DICE_FACE)
-                                             
     
     if dice_value == 6:
         position = position + dice_value
