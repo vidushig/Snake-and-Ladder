@@ -60,7 +60,7 @@ def get_player_count():
     
     no_of_players = int(input("Enter the number of players: "))
     
-    while (no_of_players < 2) or (no_of_players > 6):
+    if (no_of_players < 2) or (no_of_players > 6):
         print("""\nNOTE: Minimum number of players = 2
         Maximum number of players = 6""")
         no_of_players = int(input("Enter a valid number of players: "))
@@ -74,13 +74,34 @@ def get_player_count():
     return player_data
 
 #Roll the dice
-def get_dice_value():
+def get_dice_value(player):
     
+    position = 0
     dice_value = random.randint(1, DICE_FACE)
-    print("It's a '" + str(dice_value) + "'")
+                                             
     
-    return dice_value
+    if dice_value == 6:
+        position = position + dice_value
+        value = input(player + " has got a value '" + str(dice_value) + "' on 1st try. You will get a chance to roll the dice again. Hit enter...")
+        dice_value = random.randint(1, DICE_FACE)
+        if dice_value == 6:
+            position = position + dice_value
+            value = input(player + " has got a value '" + str(dice_value) + "' on 2nd try also. Now if you get a '" + str(dice_value) + "' on 3rd try as well, you will remain at the same position and wait for your next turn. Hit enter to roll the dice...")
+            dice_value = random.randint(1, DICE_FACE)
+            if dice_value == 6:
+                position = 0
+                print("Oops! " + player + " has got a value '" + str(dice_value) + "' again. You will remain at the same position. Try again on your next turn.")
+            else:
+                position = position + dice_value
+                print(player + ", you just escaped a 3rd '6'. It's a: '" + str(dice_value) + "'. Please move ahead by: ",position)
+        else:
+            position = position + dice_value
+            print(player + ", has got a value '" + str(dice_value) + "'. Please move ahead by: ",position)
+    else:
+        position = position + dice_value
+        print("It's a: " + str(dice_value))
 
+    return position
 
 #Player hit a snake square
 def snake_value(player, old_value, current_value):
@@ -94,17 +115,18 @@ def ladder_value(player, old_value, current_value):
     print("\nYayy. " + player + " has landed on a square with a ladder.")
     print(player + " will climb up the ladder from '" + str(old_value) + "' to '" + str(current_value) + "'")
 
+#Snake_Ladder check
 def snake_ladder(player, current_value, old_value, dice_value):
     
     #Check if value is within MAX_VALUE
     #print(player, current_value, old_value)
     
     if current_value > MAX_VALUE:
-        print("\nOops! " + player + " will remain at the same position '" + str(old_value) + "' till " + player + " gets '" + str(MAX_VALUE - old_value) + "'")
+        print("\nOops! " + player + " will remain at the same position '" + str(old_value) + "' till you get a '" + str(MAX_VALUE - old_value) + "'")
         current_value = old_value
         #print("current value is: ", current_value)
     else:
-        print("\n" + player + " will now move from '" + str(old_value) + "' to '" + str(current_value) + "'")
+        print(player + " will now move from '" + str(old_value) + "' to '" + str(current_value) + "'")
     
     if current_value in snake:
         final_value = snake.get(current_value)
@@ -114,8 +136,6 @@ def snake_ladder(player, current_value, old_value, dice_value):
         ladder_value(player, current_value, final_value)
     else:
         final_value = current_value
-    
-    #print("CV, OV, FV are: ", current_value, old_value, final_value)
     
     return final_value
 
@@ -127,6 +147,7 @@ def check_win(player, position):
         return False
     return True
 
+#Start the game
 def start():
     
     welcome()
@@ -138,7 +159,7 @@ def start():
         for i in range(len(player_data)):
             
             if player_data.iloc[i,1] == 0:
-                value = input(player_data.iloc[i,0] + " will roll the dice to start the game. Hit enter...")
+                value = input("\n" + player_data.iloc[i,0] + " will roll the dice to start the game. Hit enter...")
                 dice = random.randint(1, DICE_FACE)
                 print("\nDice value for player '" + player_data.iloc[i,0] + "' is: '" + str(dice), "'")
             
@@ -146,12 +167,12 @@ def start():
                     print(player_data.iloc[i,0] + " will enter the game now.")
                     player_data.iloc[i,1] = 1
                 else:
-                    print(player_data.iloc[i,0] + ", your dice value != '6'. Kindly try again on your next turn.\n")
+                    print(player_data.iloc[i,0] + ", your dice value != '6'. Kindly try again on your next turn.")
             
             if (dice == 6) or (player_data.iloc[i,1] == 1):
                 value = input("\nIt is " + player_data.iloc[i,0] + "'s turn next. Hit enter to roll the dice...")
                 print("\n" + str(player_data.iloc[i,0]) + " is rolling the dice...")
-                player_data.iloc[i,4] = get_dice_value()
+                player_data.iloc[i,4] = get_dice_value(player_data.iloc[i,0])
                 
                 player_data.iloc[i,3] = player_data.iloc[i,2]
                 player_data.iloc[i,2] = player_data.iloc[i,2] + player_data.iloc[i,4]
@@ -163,7 +184,7 @@ def start():
                 if (check_win(player_data.iloc[i,0], player_data.iloc[i,2]) == False):
                     GAME_STARTED = False
                     break
-            print("\nCurrent player status: \n",player_data)        
+            print("\nCurrent player status is below\n",player_data)        
     
     print("\n\nFINAL SCOREBOARD: \n\n",player_data)
     
