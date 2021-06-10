@@ -3,7 +3,7 @@ import pandas as pd
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from Snake_and_Ladder_Class_1 import *
+from Snake_and_Ladder import *
 
 class GAME_GUI(QWidget):
     
