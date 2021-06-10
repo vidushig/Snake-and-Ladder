@@ -8,5 +8,5 @@ Execute the file from the same path. This will run as command based game.
 
 **For GUI**
 Install pandas, PyQt6
-Download SL_GUI.py and Snake_and_Ladder.py to your system.
+Download SL_GUI.py and Snake_and_Ladder.py from /main/GUI to your system.
 Execute SL_GUI.py from the same path.
