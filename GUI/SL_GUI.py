@@ -340,6 +340,7 @@ class GAME_GUI(QWidget):
         self.GAME_STARTED = 0
         self.start_btn.setText("RESTART THE GAME")
         self.player_index = 0
+        
         temp, ok = QInputDialog.getInt(self, "select input dialog", "Enter number of players:")
         if ok:
             self.no_of_players = int(temp)
